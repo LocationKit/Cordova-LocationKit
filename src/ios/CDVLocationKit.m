@@ -338,7 +338,7 @@
 }
 -(NSDictionary *)dictionaryForVenue:(LKVenue *)venue {
     if (venue == nil) {
-        return [NSNull null]; //extra safey though this shouldn't be called.
+        return [[NSNull alloc] init]; //extra safey though this shouldn't be called.
     }
     NSDictionary *dictionary = @{
             @"venueId" :  [self getSafeString:venue.venueId],

@@ -1,6 +1,6 @@
 {
   "name": "cordova-locationkit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "\n        Plugman compatible wrapper for LocationKit.\n    ",
   "cordova": {
     "id": "cordova-locationkit",
