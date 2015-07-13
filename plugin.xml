@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<plugin id='cordova-locationkit'  xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.0.1">
+<plugin id='cordova-locationkit'  xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.0.3">
     <name>
         LocationKit
     </name>
@@ -23,8 +23,9 @@
     <js-module name='LocationKit' src='www/locationkit.js'>
         <clobbers target='LocationKit'/>
     </js-module>
-    <access origin="http://*.socialradar.com" />
+
     <platform name='ios'>
+        <hook type="before_plugin_install" src="scripts/ios/link_framework.sh"/>
         <info>
 
         </info>

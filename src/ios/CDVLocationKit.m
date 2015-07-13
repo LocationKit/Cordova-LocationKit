@@ -5,7 +5,7 @@
 */
 #import "CDVLocationKit.h"
 #import <LocationKit/LocationKit.h>
-#import "LocationKit/LKVisit.h"
+
 
 
 @interface CDVLocationKit ()
