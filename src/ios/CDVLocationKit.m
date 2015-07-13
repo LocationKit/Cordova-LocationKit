@@ -337,31 +337,42 @@
     return dictionary;
 }
 -(NSDictionary *)dictionaryForVenue:(LKVenue *)venue {
+    if (venue == nil) {
+        return [NSNull null]; //extra safey though this shouldn't be called.
+    }
     NSDictionary *dictionary = @{
-            @"venueId" : venue.venueId,
-            @"addressId" : venue.addressId,
-            @"name" : venue.name,
-            @"category" : venue.category,
-            @"subcategory" : venue.subcategory
+            @"venueId" :  [self getSafeString:venue.venueId],
+            @"addressId" :  [self getSafeString:venue.addressId],
+            @"name" :  [self getSafeString:venue.name],
+            @"category" :  [self getSafeString:venue.category],
+            @"subcategory" :  [self getSafeString:venue.subcategory]
     };
     return dictionary;
 }
 -(NSDictionary *)dictionaryForAddress:(LKAddress *)address {
     NSDictionary *dictionary = @{
-            @"addressId" : address.addressId,
-            @"streetNumber" : address.streetNumber,
-            @"streetName" : address.streetName,
-            @"locality" : address.locality,
-            @"region" : address.region,
-            @"postalCode" : address.postalCode,
-            @"countryCode" : address.countryCode,
-            @"country" : address.country,
+            @"addressId" : [self getSafeString:address.addressId],
+            @"streetNumber" : [self getSafeString:address.streetNumber],
+            @"streetName" : [self getSafeString:address.streetName],
+            @"locality" : [self getSafeString:address.locality],
+            @"region" : [self getSafeString:address.region],
+            @"postalCode" : [self getSafeString:address.postalCode],
+            @"countryCode" : [self getSafeString:address.countryCode],
+            @"country" : [self getSafeString:address.country],
             @"coords" : @{
                     @"latitude" :[NSString stringWithFormat:@"%f",address.coordinate.latitude ],
                     @"longitude" :[NSString stringWithFormat:@"%f",address.coordinate.longitude ]
             }
     };
     return dictionary;
+}
+-(NSObject *)getSafeString:(NSString *)string {
+    if (string == nil) {
+        return [[NSNull alloc] init];
+    } else {
+        return string;
+    }
+
 }
 @end
 
