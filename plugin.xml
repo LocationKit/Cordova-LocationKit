@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<plugin id='com.socialradar.locationkit'  xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.0.0">
+    <name>
+        LocationKit
+    </name>
+    <engines>
+        <engine name="cordova" version=">=3.8.0" />
+    </engines>
+    <description>
+        Plugman compatible wrapper for LocationKit.
+    </description>
+    <author>
+        John Fontaine
+        SocialRadar Inc
+    </author>
+    <keywords>
+        gps, geolocation, ios
+    </keywords>
+    <license>
+        c. 2015 SocialRadar Inc All Rights Reserved
+        http://locationkit.io/
+    </license>
+    <js-module name='LocationKit' src='www/locationkit.js'>
+        <clobbers target='LocationKit'/>
+    </js-module>
+    <access origin="http://*.socialradar.com" />
+    <platform name='ios'>
+        <info>
+
+        </info>
+
+        <config-file parent='/*' target='config.xml'>
+            <feature name='LocationKit'>
+                <param name='ios-package' value='CDVLocationKit'/>
+            </feature>
+        </config-file>
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
+            <string>This app requires background location tracking</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="UIBackgroundModes">
+            <array>
+                <string>location</string>
+            </array>
+        </config-file>
+        <source-file src='src/ios/CDVLocationKit.m'/>
+        <header-file src='src/ios/CDVLocationKit.h'/>
+        <framework src="CoreLocation.framework" autogen="true"/>
+        <framework src="MapKit.framework" autogen="true"/>
+
+       <framework src="src/ios/Frameworks/LocationKit.framework" custom="true"/>
+    </platform>
+</plugin>

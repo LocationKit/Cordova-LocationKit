@@ -1,0 +1,34 @@
+{
+  "name": "Cordova-LocationKit",
+  "version": "1.0.0",
+  "description": "\n        Plugman compatible wrapper for LocationKit.\n    ",
+  "cordova": {
+    "id": "com.socialradar.locationkit",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/socialradar/Cordova-LocationKit.git"
+  },
+  "keywords": [
+    "gps",
+    "geolocation",
+    "ios",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.8.0"
+    }
+  ],
+  "author": "John Fontaine",
+  "license": "\n        c. 2015 SocialRadar Inc All Rights Reserved\n        http://locationkit.io/\n    ",
+  "bugs": {
+    "url": "https://developer.socialradar.com/#/"
+  },
+  "homepage": "https://locationkit.io"
+}
