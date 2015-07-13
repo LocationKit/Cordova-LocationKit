@@ -1,9 +1,9 @@
 {
-  "name": "Cordova-LocationKit",
+  "name": "cordova-locationkit",
   "version": "1.0.0",
   "description": "\n        Plugman compatible wrapper for LocationKit.\n    ",
   "cordova": {
-    "id": "com.socialradar.locationkit",
+    "id": "cordova-locationkit",
     "platforms": [
       "ios"
     ]

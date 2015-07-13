@@ -260,19 +260,19 @@
 #pragma mark -- dictionary helpers
 
 -(LKSearchRequest *)searchRequestFromJSONDict:(NSDictionary *)search {
-    LKSearchRequest *request;
+    LKSearchRequest *request = [[LKSearchRequest  alloc] init];
     if ([search objectForKey:@"location"] != nil) {
         NSDictionary *location = [search objectForKey:@"location"];
-        NSDictionary *coordinates = [location objectForKey:@"coordinates"];
-        NSNumber *numLat = [coordinates objectForKey:@"latitude"];
-        NSNumber *numLng = [coordinates objectForKey:@"longitude"];
-        /*
-        if (strLat.length > 3 && strLng.length > 3) {
-            request = [[LKSearchRequest alloc] initWithLocation:[[CLLocation alloc] initWithLatitude:[strLat doubleValue] longitude:[strLng doubleValue]]];
-        }*/
-    }
-    if (request == nil) {
-        request = [[LKSearchRequest  alloc] init];
+        if (location != nil && ![location isKindOfClass:[NSNull class]]) {
+            NSDictionary *coordinates = [location objectForKey:@"coordinates"];
+            if (coordinates != nil && ![coordinates isKindOfClass:[NSNull class]]) {
+                NSNumber *lat = [coordinates objectForKey:@"latitude"];
+                NSNumber *lng = [coordinates objectForKey:@"longitude"];
+                if (![lat isKindOfClass:[NSNull class]] && ![lng isKindOfClass:[NSNull class]]) {
+                    request.location = [[CLLocation alloc] initWithLatitude:[lat doubleValue] longitude:[lng doubleValue]];
+                }
+            }
+        }
     }
     if ([search objectForKey:@"radius"] !=nil ) {
         NSNumber *numRadius = [search objectForKey:@"radius"];

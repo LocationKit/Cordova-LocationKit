@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<plugin id='com.socialradar.locationkit'  xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.0.0">
+<plugin id='cordova-locationkit'  xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.0.0">
     <name>
         LocationKit
     </name>
@@ -47,7 +47,6 @@
         <header-file src='src/ios/CDVLocationKit.h'/>
         <framework src="CoreLocation.framework" autogen="true"/>
         <framework src="MapKit.framework" autogen="true"/>
-
        <framework src="src/ios/Frameworks/LocationKit.framework" custom="true"/>
     </platform>
 </plugin>

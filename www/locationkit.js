@@ -13,7 +13,7 @@ var LocationKit = {
     startWithApiTokenAndInterval: function(apiToken, interval, success, error) {
         success = success || _logMessage;
         error = error || _logMessage;
-        exec(success, error, "LocationKit", "startWithApiToken", [apiToken, interval]);
+        exec(success, error, "LocationKit", "startWithApiTokenAndInterval", [apiToken, interval]);
     },
     getCurrentPlace :function(success,error) {
         success = success || _logMessage;
