@@ -1,6 +1,6 @@
 {
   "name": "cordova-locationkit",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "\n        Plugman compatible wrapper for LocationKit.\n    ",
   "cordova": {
     "id": "cordova-locationkit",
@@ -28,7 +28,7 @@
   "author": "John Fontaine",
   "license": "\n        c. 2015 SocialRadar Inc All Rights Reserved\n        http://locationkit.io/\n    ",
   "bugs": {
-    "url": "https://developer.socialradar.com/#/"
+    "url": "https://dashboard.locationkit.io"
   },
   "homepage": "https://locationkit.io"
 }
