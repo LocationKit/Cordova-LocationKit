@@ -34,7 +34,7 @@
     NSString *apiToken = [command.arguments objectAtIndex:0];
 
     if (apiToken != nil) {
-        [[LocationKit sharedInstance] startWithApiToken:apiToken andDelegate:self];
+        [[LocationKit sharedInstance] startWithApiToken:apiToken delegate:self];
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"msg_type" : @"start"}];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Arg was null"];
@@ -53,7 +53,8 @@
     NSString *strInterval = [command.arguments objectAtIndex:1];
     NSTimeInterval interval = [strInterval doubleValue];
     if (apiToken != nil && strInterval !=  nil) {
-        [[LocationKit sharedInstance] startWithApiToken:apiToken withTimeInterval:interval andDelegate:self];
+        NSDictionary *options = @{LKOptionTimedUpdatesInterval: strInterval};
+        [[LocationKit sharedInstance] startWithApiToken:apiToken delegate:self options:options];
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"msg_type" : @"start"}];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Must specify valid interval and apiToken"];

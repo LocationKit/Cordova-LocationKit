@@ -21,5 +21,4 @@
 @property(nonatomic, strong) NSString *region;
 @property NSUInteger venueCount;
 
-
 @end
