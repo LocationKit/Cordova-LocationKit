@@ -51,6 +51,8 @@ typedef NS_OPTIONS(NSUInteger, LKActivityMode) {
 
 @property(nonatomic, readonly) NSString *deviceId;
 
+@property(nonatomic, readonly) NSString *version;
+
 @property(nonatomic, copy) void (^getCurrentLocationCallback)(CLLocation *, NSError *);
 
 

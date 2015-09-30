@@ -8,6 +8,8 @@
 #import "LKVenue.h"
 #import "LKEvent.h"
 
+@class LKVisitCriteria;
+
 
 @interface LKPlace : NSObject <NSCoding>
 
@@ -15,5 +17,6 @@
 @property(nonatomic, strong) LKVenue *venue;
 @property(nonatomic, strong) NSArray *events;
 @property(nonatomic, strong) NSArray *alternatives;
+@property(nonatomic, strong) LKVisitCriteria *criteria;
 
 @end
