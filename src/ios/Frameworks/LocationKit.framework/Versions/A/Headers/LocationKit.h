@@ -27,7 +27,6 @@ UIKIT_EXTERN NSString *const LKUserValueDateInstalled;
 UIKIT_EXTERN NSString *const LKOptionWhenInUseOnly;
 UIKIT_EXTERN NSString *const LKOptionUseiOSMotionActivity;
 UIKIT_EXTERN NSString *const LKOptionTimedUpdatesInterval;
-UIKIT_EXTERN NSString *const LKOptionFilter;
 
 
 
