@@ -10,7 +10,6 @@
 #import "LKSearchRequest.h"
 #import "LKSetting.h"
 #import "LKVisitCriteria.h"
-#import "LKGeofence.h"
 #import "LKPerson.h"
 
 UIKIT_EXTERN NSString *const LKUserValueIdentifier;
@@ -27,7 +26,6 @@ UIKIT_EXTERN NSString *const LKUserValueDateInstalled;
 UIKIT_EXTERN NSString *const LKOptionWhenInUseOnly;
 UIKIT_EXTERN NSString *const LKOptionUseiOSMotionActivity;
 UIKIT_EXTERN NSString *const LKOptionTimedUpdatesInterval;
-
 
 
 typedef NS_OPTIONS(NSUInteger, LKActivityMode) {
@@ -88,6 +86,8 @@ typedef NS_OPTIONS(NSUInteger, LKActivityMode) {
 - (void)getHome:(void (^)(LKAddress *, NSError *))handler;
 
 - (void)getWork:(void (^)(LKAddress *, NSError *))handler;
+
+- (void)optOut:(void (^)( NSError *))handler;
 
 /*
  *  updateUserValues:

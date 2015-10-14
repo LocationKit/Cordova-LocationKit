@@ -6,8 +6,6 @@
 #import <Foundation/Foundation.h>
 #import "LKPlace.h"
 #import "LKVisitCriteria.h"
-#import "LKGeofence.h"
-
 
 @interface LKVisit : NSObject <NSCoding>
 
@@ -16,6 +14,4 @@
 @property (nonatomic, strong) LKPlace *place;
 @property (nonatomic, strong) LKVisitCriteria *criteria;
 
-
-- (id)initWithGeofence:(LKGeofence *)geofence;
 @end

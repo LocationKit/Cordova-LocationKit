@@ -1,6 +1,6 @@
 {
   "name": "cordova-locationkit",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "\n        Plugman compatible wrapper for LocationKit.\n    ",
   "cordova": {
     "id": "cordova-locationkit",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/socialradar/Cordova-LocationKit.git"
+    "url": "git+https://github.com/LocationKit/Cordova-LocationKit.git"
   },
   "keywords": [
     "gps",
