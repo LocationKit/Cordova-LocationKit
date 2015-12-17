@@ -1,20 +1,16 @@
-var exec = require('cordova/exec');
+function(require, exports, module) { var exec = require('cordova/exec');
 
 
 _logMessage = function(message){
     return console.log(message);
 }
 var LocationKit = {
-    startWithApiToken: function(apiToken, success,error) {
+    startWithApiToken: function(apiToken, serviceOptions, success,error) {
         success = success || _logMessage;
         error = error || _logMessage;
-        exec(success, error, "LocationKit", "startWithApiToken", [apiToken]);
+        exec(success, error, "LocationKit", "startWithApiToken", [apiToken, serviceOptions]);
     },
-    startWithApiTokenAndInterval: function(apiToken, interval, success, error) {
-        success = success || _logMessage;
-        error = error || _logMessage;
-        exec(success, error, "LocationKit", "startWithApiTokenAndInterval", [apiToken, interval]);
-    },
+
     getCurrentPlace :function(success,error) {
         success = success || _logMessage;
         error = error || _logMessage;
@@ -55,6 +51,7 @@ var LocationKit = {
         exec(success, error, "LocationKit", "updateUserValues", [user_values]);
     },
     makeLKSearchRequest : function(lat, lng, radius, limit, category, query)  {
+
          if (lat && lng) {
             return  {
                 "location" : {"coordinates" : {"latitude": lat, "longitude": lng} },
@@ -65,15 +62,29 @@ var LocationKit = {
             };
          } else {
              return  {
-                 "location" : {"coordinates" : {"latitude": lat, "longitude": lng} },
                  "radius" : radius,
                  "limit" : limit,
                  "category" : category,
                  "query" : query
              };
          }
+    },
+    makeLocationKitServiceOptions : function(interval, power_level, visit_criteria) {
+        return {
+            "interval" : interval,
+            "power_level" : power_level,
+            "visit_criteria":  visit_criteria
+        };
+    },
+    makeVisitCriteria : function(venue_name, venue_category, address_id, radius ) {
+        return {
+            "venue_name" : venue_name,
+            "venue_category" : venue_category,
+            "address_id" : address_id,
+            "radius" : radius
+        };
     }
-
 };
 
 module.exports = LocationKit;
+

@@ -1,0 +1,17 @@
+repositories {
+    jcenter()
+    maven {
+        url 'https://maven.socialradar.com/releases'
+    }
+}
+
+dependencies {
+    compile('socialradar:locationkit:3.0.10@aar') { transitive = true }
+}
+
+android {
+  packagingOptions {
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/LICENSE'
+  }
+}

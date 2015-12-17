@@ -20,6 +20,7 @@
 -(CDVPlugin*)initWithWebView:(UIWebView*)theWebView
 {
     self = (CDVLocationKit*)[super initWithWebView:(UIWebView*)theWebView];
+    self.locationManager = [[LKLocationManager alloc] init];
     if (self) {
         _suspended = false;
     }
@@ -34,7 +35,10 @@
     NSString *apiToken = [command.arguments objectAtIndex:0];
 
     if (apiToken != nil) {
-        [[LocationKit sharedInstance] startWithApiToken:apiToken delegate:self];
+        self.locationManager.debug = YES;
+        self.locationManager.apiToken = apiToken;
+        self.locationManager.advancedDelegate = self;
+        [self.locationManager startUpdatingLocation ];
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"msg_type" : @"start"}];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Arg was null"];
@@ -47,28 +51,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume) name:UIApplicationWillEnterForegroundNotification object:nil];
 
 }
--(void)startWithApiTokenAndInterval:(CDVInvokedUrlCommand*)command {
-    CDVPluginResult* pluginResult = nil;
-    NSString *apiToken = [command.arguments objectAtIndex:0];
-    NSString *strInterval = [command.arguments objectAtIndex:1];
-    NSTimeInterval interval = [strInterval doubleValue];
-    if (apiToken != nil && strInterval !=  nil) {
-        NSDictionary *options = @{LKOptionTimedUpdatesInterval: strInterval};
-        [[LocationKit sharedInstance] startWithApiToken:apiToken delegate:self options:options];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"msg_type" : @"start"}];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Must specify valid interval and apiToken"];
-    }
-    [pluginResult setKeepCallbackAsBool:YES];
-    _callbackId = command.callbackId;
-    _suspended = false;
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume) name:UIApplicationWillEnterForegroundNotification object:nil];
 
-}
 -(BOOL)checkStarted:(CDVInvokedUrlCommand*)command {
-    if ([LocationKit sharedInstance].isRunning) {
+    if (self.locationManager.isRunning) {
         return YES;
     }
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"LocaitonKit is not running"];
@@ -85,13 +70,13 @@
 -(void)getCurrentPlace:(CDVInvokedUrlCommand*)command {
     if ([self checkStarted:command]) {
         [self.commandDelegate runInBackground:^{
-            [[LocationKit sharedInstance] getCurrentPlaceWithHandler:^(LKPlace *place, NSError *error) {
+            [self.locationManager requestPlace:^(LKPlacemark * _Nullable place, NSError * _Nullable error) {
                 CDVPluginResult *pluginResult;
                 if (error) {
                     pluginResult = [self makeErrorResult:@"getCurrentPlace" withError:error];
                 }   else {
                     if (place != nil) {
-                        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self dictionaryForPlace:place]];
+                       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self dictionaryForPlace:place]];
                     } else {
                         pluginResult = [self makeErrorResult:@"getCurrentPlace" withMsg:@"no place found"];
                     }
@@ -99,8 +84,10 @@
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }];
         }];
-    }
+     }
 }
+         
+         
 -(void)getPlaceForLocation:(CDVInvokedUrlCommand*)command {
     if ([self checkStarted:command]) {
         if (command.arguments.count < 2) {
@@ -113,19 +100,20 @@
         CLLocation *location = [[CLLocation alloc] initWithLatitude:[strLat doubleValue] longitude:[strLng doubleValue]];
 
         [self.commandDelegate runInBackground:^{
-            [[LocationKit sharedInstance] getPlaceForLocation:location withHandler:^(LKPlace *place, NSError *error) {
-                CDVPluginResult *pluginResult;
-                if (error) {
-                    pluginResult = [self makeErrorResult:@"getPlaceForLocation" withError:error];
-                }   else {
-                    if (place != nil) {
-                        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self dictionaryForPlace:place]];
-                    } else {
-                        pluginResult = [self makeErrorResult:@"getPlaceForLocation" withMsg:@"no place found"];
-                    }
-                }
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-            }];
+            [self.locationManager requestPlaceForLocation:location
+                                        completionHandler:^(LKPlacemark * _Nullable place, NSError * _Nullable error) {
+                                                CDVPluginResult *pluginResult;
+                                                if (error) {
+                                                    pluginResult = [self makeErrorResult:@"getPlaceForLocation" withError:error];
+                                                }   else {
+                                                    if (place != nil) {
+                                                        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self dictionaryForPlace:place]];
+                                                    } else {
+                                                        pluginResult = [self makeErrorResult:@"getPlaceForLocation" withMsg:@"no place found"];
+                                                    }
+                                                }
+                                                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                                        }];
         }];
     }
 
@@ -133,7 +121,7 @@
 -(void)getCurrentLocation:(CDVInvokedUrlCommand*)command {
     if ([self checkStarted:command]) {
         [self.commandDelegate runInBackground:^{
-            [[LocationKit sharedInstance] getCurrentLocationWithHandler:^(CLLocation *location, NSError *error) {
+            [self.locationManager requestLocation:^(CLLocation * _Nullable location, NSError * _Nullable error) {
                 CDVPluginResult *pluginResult;
                 if (error) {
                     pluginResult = [self makeErrorResult:@"getPlaceForLocation" withError:error];
@@ -141,6 +129,7 @@
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self dictionaryForLocation:location]];
                 }
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
             }];
         }];
     }
@@ -156,13 +145,13 @@
         }
         LKSearchRequest *searchRequest =  [self searchRequestFromJSONDict:search];
         [self.commandDelegate runInBackground:^{
-            [[LocationKit sharedInstance] searchForPlacesWithRequest:searchRequest completionHandler:^(NSArray *places, NSError *error) {
+            [self.locationManager searchForPlacesWithRequest:searchRequest completionHandler:^(NSArray<LKPlacemark *> * _Nullable places, NSError * _Nullable error) {
                 CDVPluginResult *pluginResult;
                 if (error) {
                     pluginResult = [self makeErrorResult:@"searchForPlaces" withError:error];
                 } else {
                     NSMutableArray *resultsArray = [[NSMutableArray alloc] init];
-                    for (LKPlace *place in places) {
+                    for (LKPlacemark *place in places) {
                         [resultsArray addObject:[self dictionaryForPlace:place]];
                     }
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:resultsArray];
@@ -181,27 +170,23 @@
             return;
         }
         [self.commandDelegate runInBackground:^{
-            [[LocationKit sharedInstance] updateUserValues:userDict];
+            [self.locationManager setUserValues:userDict];
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     }
 }
 -(void)pause:(CDVInvokedUrlCommand*)command {
-    [[LocationKit sharedInstance] pause];
+    [self.locationManager stopUpdatingLocation];
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
 }
 -(void)resume:(CDVInvokedUrlCommand*)command {
-    NSError *error= [[LocationKit sharedInstance] resume];
+    [self.locationManager startUpdatingLocation];
+//    NSError *error= [[LocationKit sharedInstance] resume];
     CDVPluginResult *pluginResult;
-    if (error) {
-        pluginResult = [self makeErrorResult:@"resume" withError:error];
-    }   else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    }
-
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 -(void)onSuspend {
@@ -210,23 +195,28 @@
 -(void)onResume {
     _suspended = false;
 }
+#pragma mark -- LKLocationManager Delegate
 
-#pragma mark -- LocationKit Delegate
+- (void)locationManager:(LKLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    for (CLLocation * location in locations) {
+        NSLog(@"Your current location %@", location);
+        if (_callbackId != nil && !_suspended) {
+            NSDictionary *dictionary = @{
+                                         @"msg_type" : @"location",
+                                         @"position" : [self dictionaryForLocation:location]
+                                         };
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
+            [pluginResult setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
+            NSLog(@"updateLocation callbackId %@",_callbackId);
+        }
 
-- (void)locationKit:(LocationKit *)locationKit didUpdateLocation:(CLLocation *)location {
-    if (_callbackId != nil && !_suspended) {
-        NSDictionary *dictionary = @{
-                @"msg_type" : @"location",
-                @"position" : [self dictionaryForLocation:location]
-        };
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
-        NSLog(@"updateLocation callbackId %@",_callbackId);
     }
 }
-
-- (void)locationKit:(LocationKit *)locationKit didEndVisit:(LKVisit *)visit {
+- (void)locationManager:(LKLocationManager *)manager didStartVisit:(LKVisit *)visit {
+ 
+}
+- (void)locationManager:(LKLocationManager *)manager didEndVisit:(LKVisit *)visit {
     if (_callbackId != nil && !_suspended) {
         NSDictionary *dictionary = [self dictionaryForVisit:visit];
         /* CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary::@{@"msg_type" :@"end_visit", @"visit" : dictionary}];
@@ -236,26 +226,10 @@
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
     }
-
 }
 
-- (void)locationKit:(LocationKit *)locationKit didStartVisit:(LKVisit *)visit {
-    if (_callbackId != nil && !_suspended) {
-        NSDictionary *dictionary = [self dictionaryForVisit:visit];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"msg_type" :@"start_visit", @"visit" : dictionary}];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
-        NSLog(@"startVisit");
-    }
-
-}
-
-- (void)locationKit:(LocationKit *)locationKit didFailWithError:(NSError *)error {
-    if (_callbackId != nil && !_suspended) {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{@"msg_type" :@"error", @"error" : [NSString stringWithFormat:@"%@", error]}];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:_callbackId];
-    }
+- (void)locationManager:(LKLocationManager *)manager willChangeActivityMode:(LKActivityMode)mode {
+    
 }
 
 #pragma mark -- dictionary helpers
@@ -320,20 +294,20 @@
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
     NSString *arrivalDate = [NSString stringWithFormat:@"%.0f",  ([visit.arrivalDate timeIntervalSince1970] * 1000) ];
 
-    [dictionary setObject:arrivalDate forKey:@"arrivalDate"];
+    [dictionary setObject:arrivalDate forKey:@"arrival_date"];
     if (visit.departureDate != nil) {
         NSString *departureDate = [NSString stringWithFormat:@"%.0f",  ([visit.departureDate timeIntervalSince1970] * 1000) ];
-        [dictionary setObject:departureDate forKey:@"departureDate"];
+        [dictionary setObject:departureDate forKey:@"departure_date"];
     }
     [dictionary setObject:[self dictionaryForPlace:visit.place] forKey:@"place"];
     return dictionary;
 }
--(NSDictionary *)dictionaryForPlace:(LKPlace *)place {
+-(NSDictionary *)dictionaryForPlace:(LKPlacemark *)place {
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
     if (place.venue.venueId.length != 0){
         [dictionary setObject:[self dictionaryForVenue:place.venue] forKey:@"venue"];
     }
-    [dictionary setObject:[self dictionaryForAddress:place.address] forKey:@"address"];
+    [dictionary setObject:[self dictionaryForAddress:place] forKey:@"address"];
 
     return dictionary;
 }
@@ -342,27 +316,27 @@
         return [[NSNull alloc] init]; //extra safey though this shouldn't be called.
     }
     NSDictionary *dictionary = @{
-            @"venueId" :  [self getSafeString:venue.venueId],
-            @"addressId" :  [self getSafeString:venue.addressId],
+            @"venue_id" :  [self getSafeString:venue.venueId],
+            @"address_id" :  [self getSafeString:venue.addressId],
             @"name" :  [self getSafeString:venue.name],
             @"category" :  [self getSafeString:venue.category],
             @"subcategory" :  [self getSafeString:venue.subcategory]
     };
     return dictionary;
 }
--(NSDictionary *)dictionaryForAddress:(LKAddress *)address {
+-(NSDictionary *)dictionaryForAddress:(LKPlacemark *)address {
     NSDictionary *dictionary = @{
-            @"addressId" : [self getSafeString:address.addressId],
-            @"streetNumber" : [self getSafeString:address.streetNumber],
-            @"streetName" : [self getSafeString:address.streetName],
+            @"address_id" : [self getSafeString:address.addressId],
+            @"street_number" : [self getSafeString:address.subThoroughfare],
+            @"street_name" : [self getSafeString:address.thoroughfare],
             @"locality" : [self getSafeString:address.locality],
             @"region" : [self getSafeString:address.region],
-            @"postalCode" : [self getSafeString:address.postalCode],
-            @"countryCode" : [self getSafeString:address.countryCode],
+            @"postal_code" : [self getSafeString:address.postalCode],
+            @"country_code" : [self getSafeString:address.ISOcountryCode],
             @"country" : [self getSafeString:address.country],
             @"coords" : @{
-                    @"latitude" :[NSString stringWithFormat:@"%f",address.coordinate.latitude ],
-                    @"longitude" :[NSString stringWithFormat:@"%f",address.coordinate.longitude ]
+                    @"latitude" :[NSString stringWithFormat:@"%f",address.location.coordinate.latitude ],
+                    @"longitude" :[NSString stringWithFormat:@"%f",address.location.coordinate.longitude ]
             }
     };
     return dictionary;
