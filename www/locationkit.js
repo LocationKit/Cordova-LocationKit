@@ -1,5 +1,4 @@
-function(require, exports, module) { var exec = require('cordova/exec');
-
+var exec = require('cordova/exec');
 
 _logMessage = function(message){
     return console.log(message);
@@ -87,4 +86,8 @@ var LocationKit = {
 };
 
 module.exports = LocationKit;
+
+});
+
+
 

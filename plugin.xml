@@ -30,7 +30,6 @@ http://locationkit.io/
 	<header-file src="src/ios/CDVLocationKit.h" />
 	<framework autogen="true" src="CoreLocation.framework" />
 	<framework autogen="true" src="MapKit.framework" />
-	<resource-file src="Podfile" target="Podfile"/>
 </platform>
 <platform name="android">
 	<config-file parent="/*" target="res/xml/config.xml">
