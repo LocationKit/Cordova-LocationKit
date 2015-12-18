@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    compile('socialradar:locationkit:3.0.10@aar') { transitive = true }
+    compile('socialradar:locationkit:3.0.11@aar') { transitive = true }
 }
 android {
     defaultConfig {
